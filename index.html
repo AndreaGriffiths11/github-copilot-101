@@ -1,0 +1,2993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Copilot 101 — Hubber Orientation</title>
+  <meta name="description" content="An interactive GitHub Copilot 101 orientation by Andrea Griffiths.">
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    :root {
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --pad: clamp(40px, 6vw, 80px);
+    }
+
+    /* ===========================================
+       RESET & BASE
+       =========================================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      height: 100%;
+    }
+
+    body {
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      overflow-x: hidden;
+      height: 100%;
+    }
+
+    /* Scanlines overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          var(--cp-accent-soft) 2px,
+          var(--cp-accent-soft) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ===========================================
+       BACKGROUND GRID — shared across all slides
+       =========================================== */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--cp-accent-soft) 1px, transparent 1px),
+        linear-gradient(90deg, var(--cp-accent-soft) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===========================================
+       PROGRESS BAR
+       =========================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--cp-accent);
+      box-shadow: 0 0 10px var(--cp-highlight);
+      transition: width 0.4s var(--ease);
+      z-index: 1000;
+      width: 0%;
+    }
+
+    /* ===========================================
+       SLIDE COUNTER
+       =========================================== */
+    .slide-counter {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      color: var(--cp-text-soft);
+      letter-spacing: 0.1em;
+      z-index: 1000;
+    }
+
+    .slide-counter .current {
+      color: var(--cp-accent);
+    }
+
+    /* ===========================================
+       NAV DOTS
+       =========================================== */
+    .nav-dots {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cp-text-soft);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .nav-dot.active {
+      background: var(--cp-accent);
+      box-shadow: 0 0 8px var(--cp-highlight);
+      transform: scale(1.4);
+    }
+
+    /* ===========================================
+       SLIDE BASE
+       =========================================== */
+    .slide {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--pad);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Subtle top accent line per slide */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: var(--pad);
+      right: var(--pad);
+      height: 1px;
+      background: var(--cp-border);
+    }
+
+    .slide:first-of-type::before {
+      display: none;
+    }
+
+    /* ===========================================
+       REVEAL ANIMATIONS
+       Triggered by .visible class added via JS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-24px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+
+    .slide.visible .reveal,
+    .slide.visible .reveal-left,
+    .slide.visible .reveal-scale {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Stagger delays */
+    .d1 {
+      transition-delay: 0.05s;
+    }
+
+    .d2 {
+      transition-delay: 0.15s;
+    }
+
+    .d3 {
+      transition-delay: 0.25s;
+    }
+
+    .d4 {
+      transition-delay: 0.35s;
+    }
+
+    .d5 {
+      transition-delay: 0.45s;
+    }
+
+    .d6 {
+      transition-delay: 0.55s;
+    }
+
+    .d7 {
+      transition-delay: 0.65s;
+    }
+
+    .d8 {
+      transition-delay: 0.75s;
+    }
+
+    /* ===========================================
+       SHARED COMPONENTS
+       =========================================== */
+
+    /* Eyebrow label */
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cp-accent);
+    }
+
+    .eyebrow-line {
+      width: 24px;
+      height: 1px;
+      background: var(--cp-accent);
+      box-shadow: 0 0 6px var(--cp-highlight);
+    }
+
+    /* Slide headings */
+    h1 {
+      font-size: clamp(44px, 6vw, 78px);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: clamp(15px, 1.6vw, 18px);
+      line-height: 1.7;
+      color: var(--cp-text-muted);
+    }
+
+    .accent {
+      color: var(--cp-accent);
+      text-shadow: 0 0 20px var(--cp-highlight);
+    }
+
+    .amber {
+      color: var(--cp-warning);
+    }
+
+    /* Mono label */
+    .mono {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      color: var(--cp-accent);
+      letter-spacing: 0.1em;
+    }
+
+    /* Tag / badge */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 11px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-green {
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      color: var(--cp-accent);
+    }
+
+    .tag-amber {
+      background: var(--cp-highlight);
+      border: 1px solid var(--cp-border-strong);
+      color: var(--cp-warning);
+    }
+
+    .tag-red {
+      background: var(--cp-highlight);
+      border: 1px solid var(--cp-border-strong);
+      color: var(--cp-danger);
+    }
+
+    /* Card */
+    .card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cp-accent), transparent);
+      opacity: 0.5;
+    }
+
+    /* Blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: var(--cp-accent);
+      box-shadow: 0 0 8px var(--cp-highlight);
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* Glow corner */
+    .glow-corner {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    /* ===========================================
+       SLIDE 1 — TITLE
+       =========================================== */
+    #slide-1 {
+      justify-content: center;
+    }
+
+    .title-prompt {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      color: var(--cp-accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .title-prompt .sym {
+      color: var(--cp-accent);
+      text-shadow: 0 0 8px var(--cp-highlight);
+    }
+
+    #slide-1 h1 {
+      max-width: 700px;
+    }
+
+    .title-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--cp-accent);
+      flex-shrink: 0;
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    .meta-details {
+      flex: 1;
+    }
+
+    .meta-details strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .meta-details span {
+      font-size: 14px;
+      color: var(--cp-text-muted);
+    }
+
+    .updated-badge {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      color: var(--cp-warning);
+      background: var(--cp-highlight);
+      border: 1px solid var(--cp-border-strong);
+      padding: 6px 12px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .stat-corner {
+      position: absolute;
+      right: var(--pad);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .stat-box {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 12px;
+      padding: 28px 36px;
+      text-align: center;
+    }
+
+    .stat-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cp-accent);
+      box-shadow: 0 0 12px var(--cp-highlight);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .stat-num {
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      text-shadow: 0 0 40px var(--cp-highlight);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 10px;
+      color: var(--cp-text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* ===========================================
+       SLIDE 2 — 55% FASTER
+       =========================================== */
+    #slide-2 {
+      align-items: center;
+      text-align: center;
+    }
+
+    .big-stat {
+      font-size: clamp(100px, 18vw, 200px);
+      font-weight: 700;
+      line-height: 0.9;
+      color: var(--cp-accent);
+      text-shadow: 0 0 80px var(--cp-highlight);
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    #slide-2 h2 {
+      font-size: clamp(22px, 3vw, 36px);
+      margin-top: 16px;
+      margin-bottom: 0;
+      color: var(--cp-text-muted);
+      font-weight: 400;
+    }
+
+    #slide-2 p {
+      max-width: 500px;
+      margin: 24px auto 0;
+      text-align: center;
+    }
+
+    /* ===========================================
+       SLIDE 3 — AGENDA
+       =========================================== */
+    .agenda-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+      max-width: 820px;
+    }
+
+    .agenda-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+    }
+
+    .agenda-num {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      color: var(--cp-accent);
+      opacity: 0.7;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .agenda-text {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* ===========================================
+       SLIDE 5 — WHAT IS COPILOT
+       =========================================== */
+    .pillar-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .pillar {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pillar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cp-accent);
+      box-shadow: 0 0 10px var(--cp-highlight);
+      opacity: 0.5;
+    }
+
+    .pillar-num {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      color: var(--cp-accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .pillar h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .pillar p {
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .mini-stat {
+      flex: 1;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .mini-stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      text-shadow: 0 0 16px var(--cp-highlight);
+    }
+
+    .mini-stat-label {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 10px;
+      color: var(--cp-text-muted);
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    /* ===========================================
+       SLIDE 6 — EVOLUTION TIMELINE
+       =========================================== */
+    .timeline {
+      margin-top: 40px;
+      position: relative;
+      max-width: 900px;
+    }
+
+    .timeline-track {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--cp-border);
+    }
+
+    .timeline-progress {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      width: 0%;
+      height: 1px;
+      background: var(--cp-accent);
+      box-shadow: 0 0 8px var(--cp-highlight);
+      transition: width 1.5s var(--ease) 0.5s;
+    }
+
+    .slide.visible .timeline-progress {
+      width: 100%;
+    }
+
+    .timeline-items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-top: 0;
+    }
+
+    .timeline-item {
+      padding-top: 56px;
+      position: relative;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--cp-bg);
+      border: 2px solid var(--cp-accent);
+      box-shadow: 0 0 12px var(--cp-highlight);
+    }
+
+    .timeline-year {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      color: var(--cp-accent);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .timeline-item h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .timeline-item p {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ===========================================
+       SLIDE 7 — COMPLETIONS + NES
+       =========================================== */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 32px;
+    }
+
+    .feature-block h3 {
+      font-size: 19px;
+      margin-bottom: 12px;
+    }
+
+    .feature-block p {
+      font-size: 15px;
+    }
+
+    .code-mock {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      margin-top: 16px;
+    }
+
+    .code-existing {
+      color: var(--cp-text-muted);
+    }
+
+    .code-ghost {
+      color: var(--cp-accent);
+      opacity: 0.6;
+    }
+
+    .code-nes {
+      color: var(--cp-warning);
+    }
+
+    .code-comment {
+      color: var(--cp-text-soft);
+    }
+
+    /* ===========================================
+       SLIDE 8 — CHAT + AGENT MODE
+       =========================================== */
+    .feature-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .feature-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .feature-card-label {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cp-accent);
+      margin-bottom: 10px;
+    }
+
+    .feature-card h3 {
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+
+    .cmd-list {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cmd {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      background: var(--cp-surface-soft);
+      border: 1px solid var(--cp-border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--cp-accent);
+    }
+
+    /* ===========================================
+       SLIDE 9 — CODING AGENT
+       =========================================== */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 36px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 14px;
+      right: 14px;
+      height: 1px;
+      background: var(--cp-border);
+    }
+
+    .step {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px 20px;
+      position: relative;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      margin-bottom: 16px;
+    }
+
+    .step h3 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 13px;
+    }
+
+    .agent-note {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .agent-note-icon {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      color: var(--cp-accent);
+      flex-shrink: 0;
+    }
+
+    /* ===========================================
+       SLIDE 10 — COMPLEXITY GUIDE
+       =========================================== */
+    .complexity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .complexity-col h3 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .check-list,
+    .cross-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .check-list li,
+    .cross-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 12px 16px;
+      border-radius: 6px;
+    }
+
+    .check-list li {
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+    }
+
+    .cross-list li {
+      background: var(--cp-highlight);
+      border: 1px solid var(--cp-highlight);
+    }
+
+    .check-icon {
+      color: var(--cp-accent);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      flex-shrink: 0;
+    }
+
+    .cross-icon {
+      color: var(--cp-danger);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      flex-shrink: 0;
+    }
+
+    /* ===========================================
+       SLIDE 11 — CODE REVIEW + PR SUMMARIES
+       =========================================== */
+    .review-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .review-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .review-card h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .integration-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    /* ===========================================
+       SLIDE 12 — SECURITY & PRIVACY
+       =========================================== */
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .security-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .security-card-icon {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 20px;
+      color: var(--cp-accent);
+      margin-bottom: 12px;
+    }
+
+    .security-card h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .security-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .security-list li {
+      font-size: 13px;
+      color: var(--cp-text-muted);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .security-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--cp-accent);
+      font-family: Consolas, "Courier New", Courier, monospace;
+    }
+
+    .enterprise-banner {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: var(--cp-highlight);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cp-warning);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ===========================================
+       SLIDE 13 — MCP
+       =========================================== */
+    .mcp-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .mcp-explainer p {
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .connector-viz {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 28px 24px;
+    }
+
+    .connector-viz h3 {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: var(--cp-accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .mcp-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mcp-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--cp-border);
+    }
+
+    .mcp-item:last-child {
+      border-bottom: none;
+    }
+
+    .mcp-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cp-accent);
+      box-shadow: 0 0 6px var(--cp-highlight);
+      flex-shrink: 0;
+    }
+
+    /* ===========================================
+       SLIDE 14 — MULTI-MODEL
+       =========================================== */
+    .model-providers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .provider-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .provider-name {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .model-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .model-list li {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      color: var(--cp-text-muted);
+      padding: 6px 10px;
+      background: var(--cp-surface-soft);
+      border-radius: 4px;
+      border-left: 2px solid var(--cp-border);
+    }
+
+    .auto-row {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .auto-row strong {
+      color: var(--cp-accent);
+    }
+
+    /* ===========================================
+       SLIDE 15 — WHAT'S NEW
+       =========================================== */
+    .whats-new-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .new-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+    }
+
+    .new-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cp-accent);
+      box-shadow: 0 0 8px var(--cp-highlight);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .new-item-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .new-item-desc {
+      font-size: 13px;
+      color: var(--cp-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===========================================
+       SLIDE 15b — COPILOT APP
+       =========================================== */
+    .app-hero-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+      align-items: center;
+    }
+
+    .app-screenshot {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--cp-border);
+      box-shadow: 0 0 40px var(--cp-accent-soft);
+    }
+
+    .app-features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .app-feature {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+    }
+
+    .app-feature-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .app-feature h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .app-feature p {
+      font-size: 12px;
+      color: var(--cp-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===========================================
+       SLIDE 16 — SDK
+       =========================================== */
+    .sdk-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .sdk-desc p {
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .lang-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .lang-badge {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border-strong);
+      color: var(--cp-accent);
+    }
+
+    .code-block {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      background: var(--cp-surface-soft);
+      border-bottom: 1px solid var(--cp-border);
+      padding: 10px 16px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      color: var(--cp-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .code-block-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .code-block-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .code-block-body {
+      padding: 20px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+
+    .kw {
+      color: var(--cp-warning);
+    }
+
+    .fn {
+      color: var(--cp-accent);
+    }
+
+    .str {
+      color: var(--cp-link);
+    }
+
+    .cmt {
+      color: var(--cp-text-soft);
+    }
+
+    /* ===========================================
+       SLIDE 17 — WHERE IT LIVES
+       =========================================== */
+    .surfaces-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .surface-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .surface-icon {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 18px;
+      color: var(--cp-accent);
+      flex-shrink: 0;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .surface-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .surface-features {
+      font-size: 12px;
+      color: var(--cp-text-muted);
+      line-height: 1.5;
+    }
+
+    .hubber-note {
+      margin-top: 20px;
+      padding: 14px 20px;
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cp-accent);
+    }
+
+    /* ===========================================
+       SLIDE 18 — BEST PRACTICES
+       =========================================== */
+    .practices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .practice {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .practice-num {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      opacity: 0.25;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .practice h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .practice p {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ===========================================
+       SLIDE 19 — LIMITATIONS
+       =========================================== */
+    .limits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .limit-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+      border-top: 2px solid var(--cp-warning);
+    }
+
+    .limit-card h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: var(--cp-warning);
+    }
+
+    .limit-card p {
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .bottom-line {
+      margin-top: 24px;
+      padding: 18px 24px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .bottom-line .accent {
+      font-weight: 700;
+    }
+
+    /* ===========================================
+       SLIDE 20 — DEMO TIME
+       =========================================== */
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .demo-item {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .demo-num {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      text-shadow: 0 0 12px var(--cp-highlight);
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    .demo-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .demo-desc {
+      font-size: 13px;
+      color: var(--cp-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===========================================
+       SLIDE 21 — RESOURCES
+       =========================================== */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .resource-group h3 {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cp-accent);
+      margin-bottom: 16px;
+    }
+
+    .resource-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .resource-arrow {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      color: var(--cp-accent);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .resource-url {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      color: var(--cp-text-muted);
+    }
+
+    .connect-card {
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .connect-card .thank-you {
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .connect-card .tagline {
+      font-size: 15px;
+      color: var(--cp-text-muted);
+      margin-bottom: 24px;
+    }
+
+    .handle-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .handle-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .handle-platform {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 11px;
+      color: var(--cp-text-soft);
+      width: 70px;
+      flex-shrink: 0;
+    }
+
+    .handle-value {
+      font-weight: 600;
+      color: var(--cp-accent);
+    }
+
+    /* ===========================================
+       RESPONSIVE
+       =========================================== */
+    @media (max-width: 768px) {
+
+      .nav-dots,
+      .slide-counter {
+        display: none;
+      }
+
+      .two-col,
+      .feature-cards,
+      .agenda-grid,
+      .pillar-row,
+      .timeline-items,
+      .complexity-grid,
+      .review-features,
+      .security-grid,
+      .mcp-layout,
+      .model-providers,
+      .whats-new-grid,
+      .sdk-layout,
+      .app-hero-layout,
+      .surfaces-grid,
+      .practices-grid,
+      .limits-grid,
+      .demos-grid,
+      .resources-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .steps {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat-corner {
+        display: none;
+      }
+    }
+
+    /* PDF Export Button */
+    .pdf-export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 10px 18px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pdf-export-btn:hover {
+      background: var(--cp-highlight);
+      box-shadow: 0 0 12px var(--cp-highlight);
+    }
+
+    /* PPTX Export Button */
+    .pptx-export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 10px 18px;
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--cp-link);
+      background: var(--cp-accent-soft);
+      border: 1px solid var(--cp-highlight);
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pptx-export-btn:hover {
+      background: var(--cp-highlight);
+      box-shadow: 0 0 12px var(--cp-highlight);
+    }
+
+    /* ===========================================
+       PRINT / PDF EXPORT
+       =========================================== */
+    @media print {
+      html {
+        scroll-snap-type: none;
+        height: auto;
+      }
+
+      body {
+        height: auto;
+        overflow: visible;
+      }
+
+      body::before {
+        display: none;
+      }
+
+      .progress-bar,
+      .nav-dots,
+      .slide-counter,
+      .bg-grid,
+      .pdf-export-btn,
+      .pptx-export-btn {
+        display: none !important;
+      }
+
+      .slide {
+        height: 100vh;
+        min-height: unset;
+        page-break-after: always;
+        break-after: page;
+        scroll-snap-align: none;
+        opacity: 1 !important;
+        transform: none !important;
+        position: relative;
+      }
+
+      .reveal,
+      .reveal-left,
+      .reveal-scale {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+
+    /* ===========================================
+       REDUCED MOTION
+       =========================================== */
+    @media (prefers-reduced-motion: reduce) {
+
+      .reveal,
+      .reveal-left,
+      .reveal-scale {
+        transition: opacity 0.3s ease;
+        transform: none !important;
+      }
+
+      .cursor {
+        animation: none;
+        opacity: 1;
+      }
+
+      .timeline-progress {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Nav dots -->
+  <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+  <!-- Slide counter -->
+  <div class="slide-counter">
+    <span class="current" id="currentSlide">01</span>
+    <span style="color:var(--cp-text-soft)"> / </span>
+    <span id="totalSlides">20</span>
+  </div>
+
+  <!-- ===================== SLIDE 1: TITLE ===================== -->
+  <section class="slide" id="slide-1" data-index="0">
+    <div class="glow-corner"
+      style="bottom:-150px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,var(--cp-accent-soft),transparent)">
+    </div>
+
+    <div class="title-prompt reveal d1">
+      <span class="sym">$</span>
+      <span>gh copilot learn --mode=orientation --year=2026</span>
+      <span class="cursor"></span>
+    </div>
+
+    <h1 class="reveal d2">
+      GitHub<br><span class="accent">Copilot</span> 101
+    </h1>
+
+    <p class="reveal d3" style="max-width:540px;font-size:18px;margin-bottom:0;">
+      The AI pair programmer, multi-model platform, and agentic developer tool
+      you'll use every single day at GitHub.
+    </p>
+
+    <div class="title-meta reveal d4">
+      <div class="avatar">AG</div>
+      <div class="meta-details">
+        <strong>Andrea Griffiths</strong>
+        <span>Senior Developer Advocate · @acolombiadev</span>
+      </div>
+      <div class="updated-badge">Last updated: August 3, 2026</div>
+    </div>
+
+    <div class="stat-corner reveal-scale d5">
+      <div class="stat-box">
+        <div class="stat-num">55%</div>
+        <div class="stat-label">Faster · Proven</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 2: 55% FASTER ===================== -->
+  <section class="slide" id="slide-2" data-index="1">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> The Number
+    </div>
+    <div class="big-stat reveal d2" id="bigStat">55%</div>
+    <h2 class="reveal d3" style="font-weight:400;">Developers complete tasks faster.</h2>
+    <p class="reveal d4" style="text-align:center;">
+      Not marketing copy — from controlled research studies.<br>
+      You have access. Today you learn how to use it well.
+    </p>
+    <div class="glow-corner"
+      style="top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,var(--cp-accent-soft),transparent)">
+    </div>
+  </section>
+
+
+
+  <!-- ===================== SLIDE 3: AGENDA ===================== -->
+  <section class="slide" id="slide-3" data-index="2">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Today's Plan
+    </div>
+    <h2 class="reveal d2">Agenda</h2>
+
+    <div class="agenda-grid">
+      <div class="agenda-item reveal d3">
+        <span class="agenda-num">01</span>
+        <span class="agenda-text">What Copilot actually is in 2026 — not 2022</span>
+      </div>
+      <div class="agenda-item reveal d3">
+        <span class="agenda-num">02</span>
+        <span class="agenda-text">Every core feature: completions to agents</span>
+      </div>
+      <div class="agenda-item reveal d4">
+        <span class="agenda-num">03</span>
+        <span class="agenda-text">MCP, multi-model support, and the SDK</span>
+      </div>
+      <div class="agenda-item reveal d4">
+        <span class="agenda-num">04</span>
+        <span class="agenda-text">Latest drops: memory, plan mode, new models</span>
+      </div>
+      <div class="agenda-item reveal d5">
+        <span class="agenda-num">05</span>
+        <span class="agenda-text">Where Copilot lives across every surface</span>
+      </div>
+      <div class="agenda-item reveal d5">
+        <span class="agenda-num">06</span>
+        <span class="agenda-text">Best practices, real limitations, Q&amp;A</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 4: WHAT IS COPILOT ===================== -->
+  <section class="slide" id="slide-4" data-index="3">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> The Basics
+    </div>
+    <h2 class="reveal d2">What is GitHub Copilot?</h2>
+    <p class="reveal d2" style="max-width:600px;">Three things at once — and you need all three frames to understand it.
+    </p>
+
+    <div class="pillar-row">
+      <div class="pillar reveal d3">
+        <div class="pillar-num">01 / AI PAIR PROGRAMMER</div>
+        <h3>Understands Your Code</h3>
+        <p>Reads open files, knows repo structure, understands intent. Suggests what you need next, in context.</p>
+      </div>
+      <div class="pillar reveal d4">
+        <div class="pillar-num">02 / MULTI-MODEL PLATFORM</div>
+        <h3>Developer Choice</h3>
+        <p>OpenAI, Anthropic, Google. Pick the right model for the job. Not locked in.</p>
+      </div>
+      <div class="pillar reveal d5">
+        <div class="pillar-num">03 / AGENTIC TOOL</div>
+        <h3>Works Autonomously</h3>
+        <p>Takes on issues, writes PRs, reviews code, runs terminal commands. The big shift.</p>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="mini-stat reveal d6">
+        <div class="mini-stat-num">26M+</div>
+        <div class="mini-stat-label">Developers</div>
+      </div>
+      <div class="mini-stat reveal d6">
+        <div class="mini-stat-num">3B+</div>
+        <div class="mini-stat-label">Lines of code accepted</div>
+      </div>
+      <div class="mini-stat reveal d6">
+        <div class="mini-stat-num">1.2M</div>
+        <div class="mini-stat-label">PRs / month</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 5: EVOLUTION ===================== -->
+  <section class="slide" id="slide-5" data-index="4">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> History
+    </div>
+    <h2 class="reveal d2">How Copilot Has Evolved</h2>
+
+    <div class="timeline reveal d3">
+      <div class="timeline-track"></div>
+      <div class="timeline-progress"></div>
+      <div class="timeline-items">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2022</div>
+          <h3>Code Completions</h3>
+          <p>Tab to accept. Ghost text. Powered by Codex. The beginning.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2023</div>
+          <h3>Copilot Chat</h3>
+          <p>Conversation with your code. Explain, refactor, debug in natural language.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2024</div>
+          <h3>Multi-Model</h3>
+          <p>OpenAI, Anthropic, Google. Developer choice becomes a core principle.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2025–2026</div>
+          <h3 class="accent">The Agentic Era</h3>
+          <p>Coding agent, MCP, memory, SDK. From tool to teammate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 6: COMPLETIONS + NES ===================== -->
+  <section class="slide" id="slide-6" data-index="5">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Core Feature
+    </div>
+    <h2 class="reveal d2">Code Completions + Next Edit Suggestions</h2>
+
+    <div class="two-col">
+      <div class="feature-block reveal d3">
+        <div class="tag tag-green" style="margin-bottom:12px;">Completions</div>
+        <h3>Ghost Text, Tab to Accept</h3>
+        <p style="margin-top:8px;">Context-aware inline suggestions. Reads open tabs and project structure. Works with
+          every major language.</p>
+        <div class="code-mock">
+          <span class="code-existing">function </span><span class="code-existing">fetchUser</span><span
+            class="code-existing">(id) {</span><br>
+          <span class="code-ghost">&nbsp;&nbsp;return fetch(`/api/users/${id}`)</span><br>
+          <span class="code-ghost">&nbsp;&nbsp;&nbsp;&nbsp;.then(r =&gt; r.json());</span><br>
+          <span class="code-existing">}</span>
+        </div>
+        <p style="margin-top:12px;font-size:13px;"><kbd
+            style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, "Courier New", Courier, monospace;font-size:11px;">Tab</kbd>
+          to accept &nbsp;·&nbsp; <kbd
+            style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, "Courier New", Courier, monospace;font-size:11px;">Esc</kbd>
+          to dismiss</p>
+      </div>
+
+      <div class="feature-block reveal d4">
+        <div class="tag tag-amber" style="margin-bottom:12px;">NES — Next Edit Suggestions</div>
+        <h3>Predicts Where You'll Edit Next</h3>
+        <p style="margin-top:8px;">Suggests the change inline before you navigate there. Rename a variable, update
+          function signatures — one Tab and done.</p>
+        <div class="code-mock">
+          <span class="code-comment">// You just renamed: userId → accountId</span><br>
+          <span class="code-existing">getUserById(</span><span class="code-nes">accountId</span><span
+            class="code-existing">)</span><br>
+          <span class="code-existing">logUser(</span><span class="code-nes">accountId</span><span
+            class="code-existing">)</span><br>
+          <span class="code-existing">cache[</span><span class="code-nes">accountId</span><span class="code-existing">]
+            = data</span>
+        </div>
+        <p style="margin-top:12px;font-size:13px;">Now available with <span class="accent">syntax highlighting</span> in
+          VS Code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 7: CHAT + AGENT MODE ===================== -->
+  <section class="slide" id="slide-7" data-index="6">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Core Features
+    </div>
+    <h2 class="reveal d2">Copilot Chat + Agent Mode</h2>
+
+    <div class="feature-cards">
+      <div class="feature-card reveal d3">
+        <div class="feature-card-label">Available Everywhere</div>
+        <h3>Copilot Chat</h3>
+        <p>Talk to your codebase in natural language. Attach files, paste errors, include terminal output.</p>
+        <div class="cmd-list">
+          <span class="cmd">/explain</span>
+          <span class="cmd">/fix</span>
+          <span class="cmd">/tests</span>
+          <span class="cmd">/doc</span>
+        </div>
+        <p style="margin-top:16px;font-size:13px;">Available in IDE, dotcom, mobile, and CLI.</p>
+      </div>
+
+      <div class="feature-card reveal d4" style="border-color:var(--cp-highlight);">
+        <div class="feature-card-label" style="color:var(--cp-warning);">The Big Leap</div>
+        <h3>Agent Mode <span class="tag tag-amber" style="font-size:10px;vertical-align:middle;">New</span></h3>
+        <p>Cross-file tasks end to end. "Add authentication to this app" — it identifies subtasks, creates files, runs
+          terminal commands, self-heals on runtime errors.</p>
+        <p style="margin-top:12px;font-size:14px;font-weight:600;">
+          <span class="accent">Plan Mode:</span> Builds a blueprint first, asks clarifying questions, waits for your
+          sign-off before writing a single line.
+        </p>
+        <p style="margin-top:12px;font-size:13px;">CLI sub-agents: <span class="cmd"
+            style="display:inline">Explore</span> for Q&amp;A · <span class="cmd" style="display:inline">Task</span> for
+          builds &amp; tests</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 8: CODING AGENT ===================== -->
+  <section class="slide" id="slide-8" data-index="7">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Agentic Feature
+    </div>
+    <h2 class="reveal d2">The Coding Agent</h2>
+    <p class="reveal d2" style="max-width:600px;">Assign a GitHub issue directly to Copilot — just like you'd assign it
+      to a teammate.</p>
+
+    <div class="steps">
+      <div class="step reveal d3">
+        <div class="step-num">01</div>
+        <h3>Assign the Issue</h3>
+        <p>On github.com, Mobile, or the CLI. Just like any teammate assignment.</p>
+      </div>
+      <div class="step reveal d4">
+        <div class="step-num">02</div>
+        <h3>Secure Environment</h3>
+        <p>Spins up isolated environment via GitHub Actions. Writes code, pushes commits.</p>
+      </div>
+      <div class="step reveal d5">
+        <div class="step-num">03</div>
+        <h3>Draft PR Opened</h3>
+        <p>Track progress in session logs. Give feedback mid-flight.</p>
+      </div>
+      <div class="step reveal d6">
+        <div class="step-num">04</div>
+        <h3>Human Approval</h3>
+        <p>Required before any CI/CD runs. Your branch protections still apply.</p>
+      </div>
+    </div>
+
+    <div class="agent-note reveal d7">
+      <span class="agent-note-icon">!</span>
+      <span>Sweet spot: <strong>low-to-medium complexity</strong> tasks in well-tested codebases. Your guardrails stay
+        in place.</span>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 9: COMPLEXITY GUIDE ===================== -->
+  <section class="slide" id="slide-9" data-index="8">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Practical Guide
+    </div>
+    <h2 class="reveal d2">Coding Agent Complexity Guide</h2>
+    <p class="reveal d2" style="max-width:620px;">Knowing this boundary is how you get the most out of the agent without
+      wasting cycles.</p>
+
+    <div class="complexity-grid">
+      <div class="complexity-col reveal d3">
+        <h3><span class="accent">✓</span> &nbsp;Great for the Agent</h3>
+        <ul class="check-list">
+          <li><span class="check-icon">+</span> New React component with props and tests</li>
+          <li><span class="check-icon">+</span> Adding an API endpoint to existing route</li>
+          <li><span class="check-icon">+</span> Refactoring a function to async/await</li>
+          <li><span class="check-icon">+</span> Writing unit tests for a specific module</li>
+          <li><span class="check-icon">+</span> Fixing lint errors and updating imports</li>
+        </ul>
+      </div>
+
+      <div class="complexity-col reveal d4">
+        <h3><span style="color:var(--cp-danger);">✕</span> &nbsp;Keep for Yourself (for now)</h3>
+        <ul class="cross-list">
+          <li><span class="cross-icon">-</span> Restructuring your entire codebase</li>
+          <li><span class="cross-icon">-</span> Migrating REST to GraphQL</li>
+          <li><span class="cross-icon">-</span> Complex database migrations</li>
+          <li><span class="cross-icon">-</span> Implementing auth from scratch</li>
+          <li><span class="cross-icon">-</span> Multi-repo changes with cross-dependencies</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 10: CODE REVIEW ===================== -->
+  <section class="slide" id="slide-10" data-index="9">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Quality & Velocity
+    </div>
+    <h2 class="reveal d2">Code Review + PR Summaries</h2>
+
+    <div class="review-features">
+      <div class="review-card reveal d3">
+        <h3>Copilot Code Review</h3>
+        <p>Add Copilot as a reviewer on any PR. First-pass review: bugs, performance, security concerns — all in one
+          pass.</p>
+        <div class="integration-badges" style="margin-top:14px;">
+          <span class="tag tag-green">CodeQL</span>
+          <span class="tag tag-amber">ESLint</span>
+          <span class="tag tag-green">LLM Reasoning</span>
+        </div>
+        <p style="margin-top:14px;font-size:13px;">Suggests fixes with one click. Hand off complex fixes to the coding
+          agent.</p>
+        <p style="margin-top:10px;font-size:13px;">Customize with <span class="mono">copilot-instructions.md</span></p>
+      </div>
+
+      <div class="review-card reveal d4">
+        <h3>PR Summaries</h3>
+        <p>Auto-generated clear descriptions when you create or edit a pull request.</p>
+        <ul class="security-list" style="margin-top:14px;">
+          <li>Prose overview of what changed and why</li>
+          <li>Bulleted list of key changes</li>
+          <li>Links to specific lines of interest</li>
+          <li>Helps reviewers understand context fast</li>
+        </ul>
+        <p style="margin-top:16px;font-size:14px;font-weight:600;">Copilot does the busy work. <span class="accent">You
+            add the why.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 11: SECURITY & PRIVACY ===================== -->
+  <section class="slide" id="slide-11" data-index="10">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> The Important Slide
+    </div>
+    <h2 class="reveal d2">Security &amp; Privacy</h2>
+    <p class="reveal d2" style="max-width:600px;">People always ask. Here's the full picture.</p>
+
+    <div class="security-grid">
+      <div class="security-card reveal d3">
+        <div class="security-card-icon">[?]</div>
+        <h3>What Copilot Sees</h3>
+        <ul class="security-list">
+          <li>Your open files and active editor context</li>
+          <li>Recently viewed files in your workspace</li>
+          <li>Code you paste into Chat</li>
+          <li>Your repository structure</li>
+          <li>That's it.</li>
+        </ul>
+      </div>
+      <div class="security-card reveal d4">
+        <div class="security-card-icon">[→]</div>
+        <h3>Where It Goes</h3>
+        <ul class="security-list">
+          <li>Sent to GitHub's AI providers (OpenAI, Anthropic, Google)</li>
+          <li>Your code is NOT used to train models — default</li>
+          <li>Encrypted in transit and at rest</li>
+          <li>Prompts discarded after response is generated</li>
+        </ul>
+      </div>
+      <div class="security-card reveal d5">
+        <div class="security-card-icon">[#]</div>
+        <h3>Enterprise Controls</h3>
+        <ul class="security-list">
+          <li>IP indemnification included</li>
+          <li>Content exclusion filters per repo/file</li>
+          <li>Audit logs for compliance</li>
+          <li>Org-level policy management</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="enterprise-banner reveal d6">
+      <span style="font-family:Consolas, "Courier New", Courier, monospace;font-size:16px;">★</span>
+      As Hubbers, you're on Enterprise. All of these protections are active for you right now.
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 12: MCP ===================== -->
+  <section class="slide" id="slide-12" data-index="11">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Extensibility
+    </div>
+    <h2 class="reveal d2">MCP + Extensibility</h2>
+
+    <div class="mcp-layout">
+      <div class="mcp-explainer">
+        <p class="reveal d3">
+          MCP = <strong>Model Context Protocol</strong> —
+          the USB-C port for AI. Build an MCP server once and it works with
+          Copilot, Claude Code, Cursor, Windsurf, and any MCP-compatible tool.
+        </p>
+        <p class="reveal d4">
+          An open standard for connecting AI to tools and data sources.
+          Both Agent Mode and the Coding Agent support MCP tools.
+        </p>
+        <p class="reveal d5" style="font-size:14px;">
+          <span class="amber">Note:</span> The old GitHub App-based Extensions were sunset in November 2025
+          and replaced by MCP. Developers shouldn't have to rebuild integrations for every platform.
+        </p>
+      </div>
+
+      <div class="connector-viz reveal d3">
+        <h3>What MCP Unlocks</h3>
+        <div class="mcp-row">
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> Query databases directly
+          </div>
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> Read telemetry and logs
+          </div>
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> Manage infrastructure
+          </div>
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> Connect to Jira, Slack, and more
+          </div>
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> Build custom internal tools
+          </div>
+          <div class="mcp-item">
+            <div class="mcp-dot"></div> OAuth authentication supported
+          </div>
+        </div>
+        <div style="margin-top:16px;" class="tag tag-green">GitHub MCP Registry — discoverable servers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 13: MULTI-MODEL ===================== -->
+  <section class="slide" id="slide-13" data-index="12">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Model Choice
+    </div>
+    <h2 class="reveal d2">Multi-Model Support</h2>
+    <p class="reveal d2" style="max-width:600px;">You're not locked into one model. Pick the right one for the job.</p>
+
+    <div class="model-providers">
+      <div class="provider-card reveal d3">
+        <div class="provider-name" style="color:var(--cp-link);">OpenAI</div>
+        <ul class="model-list">
+          <li>GPT-5 mini</li>
+          <li>GPT-5.3-Codex</li>
+          <li>GPT-5.4</li>
+          <li>GPT-5.4 mini</li>
+          <li>GPT-5.4 nano</li>
+          <li>GPT-5.5</li>
+          <li>GPT-5.6 Luna</li>
+          <li>GPT-5.6 Sol</li>
+          <li>GPT-5.6 Terra</li>
+        </ul>
+        <p style="margin-top:12px;font-size:12px;color:var(--cp-text-muted);">Use Codex for fast agentic code gen</p>
+      </div>
+      <div class="provider-card reveal d4">
+        <div class="provider-name" style="color:var(--cp-warning);">Anthropic</div>
+        <ul class="model-list">
+          <li>Claude Haiku 4.5</li>
+          <li>Claude Sonnet 4.5</li>
+          <li>Claude Sonnet 4.6</li>
+          <li>Claude Opus 4.6</li>
+          <li>Claude Opus 4.7</li>
+        </ul>
+        <p style="margin-top:12px;font-size:12px;color:var(--cp-text-muted);">Opus for complex reasoning &amp; architecture
+        </p>
+      </div>
+      <div class="provider-card reveal d5">
+        <div class="provider-name" style="color:var(--cp-link);">Google</div>
+        <ul class="model-list">
+          <li>Gemini 3.1 Pro <span class="tag tag-amber" style="font-size:9px;">Preview</span></li>
+          <li>Gemini 3.6 Flash</li>
+        </ul>
+        <p style="margin-top:12px;font-size:12px;color:var(--cp-text-muted);">Gemini for large context &amp; multi-file ops
+        </p>
+      </div>
+    </div>
+
+    <div class="auto-row reveal d6">
+      <div>Use <strong>Auto mode</strong> — GitHub picks the best model for your prompt, availability, and plan.</div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 14: WHAT'S NEW ===================== -->
+  <section class="slide" id="slide-14" data-index="13">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Latest Drops · 2026
+    </div>
+    <h2 class="reveal d2">What's New</h2>
+    <p class="reveal d2" style="max-width:580px;">Copilot ships fast. Here's what landed recently.</p>
+
+    <div class="whats-new-grid">
+      <div class="new-item reveal d3">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">Copilot Memory <span class="tag tag-amber" style="font-size:10px;">Public
+              Preview</span></div>
+          <div class="new-item-desc">Retains repo-specific context across sessions. Shared across Chat, Code Review,
+            CLI, and the Coding Agent. Auto-expires after 28 days.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d3">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">Copilot SDK <span class="tag tag-amber" style="font-size:10px;">Tech
+              Preview</span></div>
+          <div class="new-item-desc">Programmatic access to the full agent stack in Node.js, Python, Go, and .NET. Embed
+            Copilot into your own developer tools.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d4">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">Plan Mode</div>
+          <div class="new-item-desc">Available in CLI and VS Code. Copilot builds a plan and gets your approval before
+            writing a line.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d4">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">GPT-5.6 Luna · Sol · Terra</div>
+          <div class="new-item-desc">Latest model drops. New models auto-available for Pro, Pro+, and Free users
+            without visiting settings.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d5">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">Coding Agent Model Picker</div>
+          <div class="new-item-desc">Now available for Business and Enterprise, not just individual plans.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d5">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">Enterprise Teams Model Policies <span class="tag tag-amber"
+              style="font-size:10px;">Public Preview</span></div>
+          <div class="new-item-desc">Set a baseline model policy for the enterprise, then grant additional models to
+            specific enterprise teams by role or function.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d6">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">CLI: Remote Chronicle-In</div>
+          <div class="new-item-desc">Run the CLI against remote repos without cloning. Chronicle-in brings repo context
+            directly into your terminal session.</div>
+        </div>
+      </div>
+      <div class="new-item reveal d6">
+        <div class="new-dot"></div>
+        <div>
+          <div class="new-item-title">GitHub Copilot App <span class="tag tag-amber" style="font-size:10px;">Tech
+              Preview</span></div>
+          <div class="new-item-desc">A GitHub-native desktop app for agentic development. Start sessions from issues or
+            PRs, work with stacked pull requests, steer in real time, and ship via pull request.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 15: COPILOT APP ===================== -->
+  <section class="slide" id="slide-15" data-index="14">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> New Surface · May 2026
+    </div>
+    <h2 class="reveal d2">GitHub Copilot App <span class="tag tag-amber" style="font-size:12px;">Technical Preview</span></h2>
+    <p class="reveal d2" style="max-width:620px;">A GitHub-native desktop experience for agentic development — start from the work in front of you, steer it live, and ship through pull requests.</p>
+
+    <div class="app-hero-layout">
+      <img src="copilot-app-preview.png" alt="GitHub Copilot App showing a session with code changes and a pull request" class="app-screenshot reveal d3">
+      <div class="app-features">
+        <div class="app-feature reveal d3">
+          <div class="app-feature-icon">🧭</div>
+          <div>
+            <h4>Start from GitHub Context</h4>
+            <p>Open sessions from issues, PRs, prompts, or previous sessions. Context travels with you.</p>
+          </div>
+        </div>
+        <div class="app-feature reveal d4">
+          <div class="app-feature-icon">⚡</div>
+          <div>
+            <h4>Focused Sessions</h4>
+            <p>Each session has its own branch, files, and conversation. Pause, resume, and work across projects.</p>
+          </div>
+        </div>
+        <div class="app-feature reveal d4">
+          <div class="app-feature-icon">✅</div>
+          <div>
+            <h4>Steer, Validate &amp; Ship</h4>
+            <p>Review the plan and diff, run commands, open previews, then move to a pull request — all in one place.</p>
+          </div>
+        </div>
+        <div class="app-feature reveal d5">
+          <div class="app-feature-icon">🔀</div>
+          <div>
+            <h4>Agent Merge</h4>
+            <p>Let it address review comments, fix failing checks, and merge once your conditions are met.</p>
+          </div>
+        </div>
+        <div class="app-feature reveal d6">
+          <div class="app-feature-icon">📚</div>
+          <div>
+            <h4>Stacked Pull Requests</h4>
+            <p>Build and manage dependent pull requests as a stack, so related changes can be reviewed and merged in order.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 16: SDK ===================== -->
+  <section class="slide" id="slide-16" data-index="15">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> For Tool Builders
+    </div>
+    <h2 class="reveal d2">GitHub Copilot SDK</h2>
+
+    <div class="sdk-layout">
+      <div class="sdk-desc">
+        <p class="reveal d3">
+          Programmatic access to the <strong>full agent stack</strong> — not just completions or chat.
+          Agent mode, MCP tools, code review, all of it, available through code.
+        </p>
+        <p class="reveal d4" style="font-size:15px;">
+          Copilot doesn't have to live inside an IDE. Think internal CLIs, automation pipelines,
+          dashboards, CI/CD hooks. Anywhere you have a developer tool, you can embed Copilot.
+        </p>
+        <div class="lang-badges reveal d5">
+          <span class="lang-badge">Node.js</span>
+          <span class="lang-badge">Python</span>
+          <span class="lang-badge">Go</span>
+          <span class="lang-badge">.NET</span>
+        </div>
+        <div class="tag tag-amber reveal d6" style="margin-top:16px;display:inline-flex;">Technical Preview — Start
+          building today</div>
+      </div>
+
+      <div class="code-block reveal d3">
+        <div class="code-block-header">
+          <div class="code-block-dots">
+            <div class="code-block-dot" style="background:var(--cp-danger)"></div>
+            <div class="code-block-dot" style="background:var(--cp-warning)"></div>
+            <div class="code-block-dot" style="background:var(--cp-success)"></div>
+          </div>
+          issuecrush/server.js
+        </div>
+        <div class="code-block-body">
+          <span class="kw">const</span> { <span class="fn">CopilotClient</span> } = <span class="kw">await</span> <span class="fn">import</span>(<span
+            class="str">'@github/copilot-sdk'</span>);<br><br>
+          <span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">CopilotClient</span>();<br>
+          <span class="kw">await</span> client.<span class="fn">start</span>();<br><br>
+          <span class="kw">const</span> session = <span class="kw">await</span> client.<span class="fn">createSession</span>({<br>
+          &nbsp;&nbsp;model: <span class="str">'gpt-4.1'</span>,<br>
+          });<br><br>
+          <span class="kw">const</span> response = <span class="kw">await</span> session.<span class="fn">sendAndWait</span>({<br>
+          &nbsp;&nbsp;prompt: <span class="str">`Summarize this GitHub issue for triage...`</span>,<br>
+          }, <span class="num">30000</span>);<br><br>
+          <span class="kw">const</span> summary = response.data.content;<br>
+          <span class="kw">await</span> session.<span class="fn">destroy</span>();<br>
+          <span class="kw">await</span> client.<span class="fn">stop</span>();
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 17: WHERE IT LIVES ===================== -->
+  <section class="slide" id="slide-17" data-index="16">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Every Surface
+    </div>
+    <h2 class="reveal d2">Where Copilot Lives</h2>
+    <p class="reveal d2" style="max-width:580px;">Copilot isn't just an IDE plugin anymore.</p>
+
+    <div class="surfaces-grid">
+      <div class="surface-card reveal d3">
+        <div class="surface-icon">[&lt;/&gt;]</div>
+        <div>
+          <div class="surface-name">IDE</div>
+          <div class="surface-features">VS Code · JetBrains · Visual Studio · Xcode · Eclipse · Neovim<br>Completions,
+            Chat, Agent Mode, Code Review, MCP</div>
+        </div>
+      </div>
+      <div class="surface-card reveal d3">
+        <div class="surface-icon">[gh]</div>
+        <div>
+          <div class="surface-name">GitHub.com</div>
+          <div class="surface-features">Chat · PR Summaries · Code Review · Coding Agent · Knowledge Bases</div>
+        </div>
+      </div>
+      <div class="surface-card reveal d3">
+        <div class="surface-icon">[&phone;]</div>
+        <div>
+          <div class="surface-name">Mobile</div>
+          <div class="surface-features">iOS + Android via GitHub Mobile<br>Chat · PR Review · Assign issues to Copilot
+            from your phone</div>
+        </div>
+      </div>
+      <div class="surface-card reveal d4">
+        <div class="surface-icon">[$_]</div>
+        <div>
+          <div class="surface-name">Terminal / CLI</div>
+          <div class="surface-features">Chat · Plan Mode · Agent Mode<br>Explore + Task sub-agents · Delegate to Coding
+            Agent</div>
+        </div>
+      </div>
+      <div class="surface-card reveal d4">
+        <div class="surface-icon">[⚡]</div>
+        <div>
+          <div class="surface-name">Copilot App <span class="tag tag-amber" style="font-size:9px;">Tech Preview</span></div>
+          <div class="surface-features">GitHub-native desktop app<br>Agentic sessions · Agent Merge · Steer &amp; ship from one place</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hubber-note reveal d6">
+      ★ &nbsp; As Hubbers, you have a full Enterprise license. Every feature is available to you right now.
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 17: BEST PRACTICES ===================== -->
+  <section class="slide" id="slide-18" data-index="17">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> How to Use It Well
+    </div>
+    <h2 class="reveal d2">Best Practices</h2>
+
+    <div class="practices-grid">
+      <div class="practice reveal d3">
+        <div class="practice-num">01</div>
+        <h3>Review Everything</h3>
+        <p>Copilot is your pair, not your autopilot. Always review generated code for correctness and security.</p>
+      </div>
+      <div class="practice reveal d3">
+        <div class="practice-num">02</div>
+        <h3>Give Great Context</h3>
+        <p>Clear comments, descriptive variable names, relevant files open. Better input equals better output.</p>
+      </div>
+      <div class="practice reveal d4">
+        <div class="practice-num">03</div>
+        <h3>Break It Down</h3>
+        <p>Complex problems become manageable when you feed Copilot smaller, well-defined tasks.</p>
+      </div>
+      <div class="practice reveal d4">
+        <div class="practice-num">04</div>
+        <h3>Use AGENTS.md</h3>
+        <p>Share project-specific instructions to keep all agents in sync with your team's coding practices.</p>
+      </div>
+      <div class="practice reveal d5">
+        <div class="practice-num">05</div>
+        <h3>Start Simple</h3>
+        <p>Begin with completions and chat. Then agent mode. Then the coding agent. Build confidence over time.</p>
+      </div>
+      <div class="practice reveal d5">
+        <div class="practice-num">06</div>
+        <h3>Custom Instructions</h3>
+        <p>Define team standards in <span class="mono">copilot-instructions.md</span> so Copilot matches your
+          conventions automatically.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 18: LIMITATIONS ===================== -->
+  <section class="slide" id="slide-19" data-index="18">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Real Talk
+    </div>
+    <h2 class="reveal d2">Real Talk: Limitations</h2>
+    <p class="reveal d2" style="max-width:620px;">Knowing the edges makes you better at using it. Copilot is not magic.
+    </p>
+
+    <div class="limits-grid">
+      <div class="limit-card reveal d3">
+        <h3>Can't Read Your Mind</h3>
+        <p>Copilot works from context: your code, your comments, your files. Vague input gets vague output.</p>
+      </div>
+      <div class="limit-card reveal d3">
+        <h3>Not a Compiler</h3>
+        <p>Suggestions can contain bugs, incorrect logic, or hallucinated APIs. You are always the final reviewer.</p>
+      </div>
+      <div class="limit-card reveal d4">
+        <h3>Mirrors Your Patterns</h3>
+        <p>If your codebase has bad practices, Copilot will suggest more of the same. Good code begets good suggestions.
+        </p>
+      </div>
+      <div class="limit-card reveal d4" style="grid-column: 1 / -1; max-width: 480px;">
+        <h3>Agent Has Boundaries</h3>
+        <p>Best at low-to-medium complexity in well-tested codebases. Not ready for your gnarliest architectural
+          refactors — yet.</p>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal d6">
+      You are the developer. <span class="accent">Copilot is a powerful tool at your service</span> — not the other way
+      around.
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 19: DEMO TIME ===================== -->
+  <section class="slide" id="slide-20" data-index="19">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Live
+    </div>
+    <h2 class="reveal d2">Demo Time</h2>
+    <p class="reveal d2" style="max-width:620px;">Let's see Copilot in action. We'll pick what to show based on the time we've got — interrupt with questions as we go.</p>
+  </section>
+
+  <!-- ===================== SLIDE 20: RESOURCES ===================== -->
+  <section class="slide" id="slide-21" data-index="20">
+    <div class="eyebrow reveal d1">
+      <div class="eyebrow-line"></div> Keep Going
+    </div>
+    <h2 class="reveal d2">Resources + Let's Connect</h2>
+
+    <div class="resources-grid">
+      <div class="resource-group reveal d3">
+        <h3>Keep Learning</h3>
+        <ul class="resource-list">
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://docs.github.com/copilot" target="_blank" style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">Official Docs</div>
+                <div class="resource-url">docs.github.com/copilot</div>
+              </a>
+            </div>
+          </li>
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://github.com/features/copilot/whats-new" target="_blank"
+                style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">What's New</div>
+                <div class="resource-url">github.com/features/copilot/whats-new</div>
+              </a>
+            </div>
+          </li>
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://github.blog" target="_blank" style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">The GitHub Blog</div>
+                <div class="resource-url">github.blog</div>
+              </a>
+            </div>
+          </li>
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://github.com/mcp" target="_blank"
+                style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">GitHub MCP Registry</div>
+                <div class="resource-url">https://github.com/mcp</div>
+              </a>
+            </div>
+          </li>
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://github.com/trust-center" target="_blank" style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">GitHub Trust Center</div>
+                <div class="resource-url">github.com/trust-center</div>
+              </a>
+            </div>
+          </li>
+          <li class="resource-item">
+            <span class="resource-arrow">→</span>
+            <div>
+              <a href="https://mainbranch.dev" target="_blank" style="text-decoration:none;color:inherit;">
+                <div style="font-weight:600;font-size:14px;margin-bottom:2px;">Main Branch Newsletter</div>
+                <div class="resource-url">mainbranch.dev</div>
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="connect-card reveal d3">
+        <div class="thank-you">Thank you. <span class="cursor"></span></div>
+        <div class="tagline">Let's open it up for Q&amp;A.</div>
+
+        <ul class="handle-list">
+          <li class="handle-item">
+            <a href="https://x.com/acolombiadev" target="_blank"
+              style="text-decoration:none;color:inherit;display:contents;">
+              <span class="handle-platform">Twitter/X</span>
+              <span class="handle-value">@acolombiadev</span>
+            </a>
+          </li>
+          <li class="handle-item">
+            <a href="https://ag11.dev" target="_blank" style="text-decoration:none;color:inherit;display:contents;">
+              <span class="handle-platform">Website</span>
+              <span class="handle-value">AG11.dev</span>
+            </a>
+          </li>
+        </ul>
+
+        <div style="margin-top:20px;" class="tag tag-green">Fundamentals first, always.</div>
+
+        <button class="pdf-export-btn" onclick="window.print()" aria-label="Export presentation to PDF">
+          ↓ Export to PDF
+        </button>
+        <button class="pptx-export-btn" onclick="exportToPptx()" aria-label="Export presentation to PPTX">
+          ↓ Export to PPTX
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===========================================
+       JAVASCRIPT — Slide Presentation Controller
+       Handles navigation, animations, scroll tracking
+       =========================================== -->
+  <script>
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.totalSlides = this.slides.length;
+        this.currentIndex = 0;
+        this.isScrolling = false;
+
+        this.progressBar = document.getElementById('progressBar');
+        this.currentSlideEl = document.getElementById('currentSlide');
+        this.totalSlidesEl = document.getElementById('totalSlides');
+        this.navDotsEl = document.getElementById('navDots');
+
+        this.totalSlidesEl.textContent = String(this.totalSlides).padStart(2, '0');
+
+        this.buildNavDots();
+        this.initObserver();
+        this.initKeyboard();
+        this.initTouch();
+        this.initScroll();
+
+        // Trigger first slide immediately
+        setTimeout(() => {
+          this.slides[0].classList.add('visible');
+          this.updateUI(0);
+        }, 100);
+      }
+
+      /* Build navigation dots on the right side */
+      buildNavDots() {
+        this.slides.forEach((_, i) => {
+          const dot = document.createElement('button');
+          dot.classList.add('nav-dot');
+          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.addEventListener('click', () => this.goToSlide(i));
+          this.navDotsEl.appendChild(dot);
+        });
+      }
+
+      /* Intersection Observer — adds .visible when slide enters viewport */
+      initObserver() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                const index = parseInt(entry.target.dataset.index);
+                this.updateUI(index);
+              }
+            });
+          },
+          { threshold: 0.4 }
+        );
+
+        this.slides.forEach(slide => observer.observe(slide));
+      }
+
+      /* Keyboard navigation — arrows and space */
+      initKeyboard() {
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            this.goToSlide(this.currentIndex + 1);
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.goToSlide(this.currentIndex - 1);
+          }
+        });
+      }
+
+      /* Touch/swipe support */
+      initTouch() {
+        let startY = 0;
+        document.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend', (e) => {
+          const diff = startY - e.changedTouches[0].clientY;
+          if (Math.abs(diff) > 50) {
+            this.goToSlide(this.currentIndex + (diff > 0 ? 1 : -1));
+          }
+        }, { passive: true });
+      }
+
+      /* Throttled scroll listener for updating UI while free-scrolling */
+      initScroll() {
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+          if (!ticking) {
+            requestAnimationFrame(() => {
+              this.detectCurrentSlide();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
+      }
+
+      detectCurrentSlide() {
+        const mid = window.innerHeight / 2;
+        this.slides.forEach((slide, i) => {
+          const rect = slide.getBoundingClientRect();
+          if (rect.top <= mid && rect.bottom >= mid) {
+            this.currentIndex = i;
+            this.updateUI(i);
+          }
+        });
+      }
+
+      /* Navigate to a specific slide by index */
+      goToSlide(index) {
+        if (index < 0 || index >= this.totalSlides) return;
+        this.currentIndex = index;
+        this.slides[index].scrollIntoView({ behavior: 'smooth' });
+      }
+
+      /* Update progress bar, counter, and nav dots */
+      updateUI(index) {
+        this.currentIndex = index;
+
+        // Progress bar
+        const pct = this.totalSlides <= 1 ? 100 : (index / (this.totalSlides - 1)) * 100;
+        this.progressBar.style.width = pct + '%';
+
+        // Counter
+        this.currentSlideEl.textContent = String(index + 1).padStart(2, '0');
+
+        // Nav dots
+        const dots = this.navDotsEl.querySelectorAll('.nav-dot');
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      }
+    }
+
+    // Boot
+    new SlidePresentation();
+  </script>
+
+  <!-- PptxGenJS for PPTX export -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs/dist/pptxgen.bundle.js"></script>
+  <script>
+    function exportToPptx() {
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_WIDE'; // 13.33" x 7.5"
+      pptx.title = 'GitHub Copilot 101';
+      pptx.subject = 'GitHub Copilot 101 Presentation';
+      pptx.author = 'Andrea Griffiths';
+
+      const styles = getComputedStyle(document.documentElement);
+      const colorToken = (name) => styles.getPropertyValue(name).trim().replace('#', '').toUpperCase();
+      const BG_COLOR = colorToken('--cp-bg');
+      const TEXT_WHITE = colorToken('--cp-text');
+      const TEXT_DIM = colorToken('--cp-text-muted');
+      const ACCENT_GREEN = colorToken('--cp-accent');
+
+      document.querySelectorAll('.slide').forEach((slideEl) => {
+        const slide = pptx.addSlide();
+        slide.background = { color: BG_COLOR };
+
+        // Title: prefer h1, fall back to h2
+        const titleEl = slideEl.querySelector('h1, h2');
+        const titleText = titleEl ? titleEl.innerText.replace(/\n+/g, ' ').trim() : '';
+
+        if (titleText) {
+          slide.addText(titleText, {
+            x: 0.5, y: 0.5, w: 12.33, h: 1.4,
+            fontSize: 32, bold: true, color: TEXT_WHITE,
+            fontFace: 'Segoe UI', wrap: true
+          });
+        }
+
+        // Accent / eyebrow
+        const eyebrowEl = slideEl.querySelector('.eyebrow, .title-prompt');
+        if (eyebrowEl) {
+          slide.addText(eyebrowEl.innerText.trim(), {
+            x: 0.5, y: 0.3, w: 12.33, h: 0.3,
+            fontSize: 11, color: ACCENT_GREEN,
+            fontFace: 'Courier New', italic: true
+          });
+        }
+
+        // Body: paragraphs and list items (skip empty or duplicate title text)
+        const bodyLines = [];
+        slideEl.querySelectorAll('p, li, .big-stat, .stat-num').forEach((el) => {
+          const text = el.innerText.trim();
+          if (text && text !== titleText) {
+            bodyLines.push({ text: text + '\n', options: { color: TEXT_DIM, fontSize: 14 } });
+          }
+        });
+
+        if (bodyLines.length) {
+          slide.addText(bodyLines, {
+            x: 0.5, y: 2.1, w: 12.33, h: 4.8,
+            fontFace: 'Segoe UI', valign: 'top', wrap: true
+          });
+        }
+      });
+
+      pptx.writeFile({ fileName: 'copilot-101.pptx' });
+    }
+  </script>
+</body>
+
+</html>
