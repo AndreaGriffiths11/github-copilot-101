@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub Copilot 101 — Hubber Orientation</title>
   <meta name="description" content="An interactive GitHub Copilot 101 orientation by Andrea Griffiths.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
   <script>
     (() => {
       const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
@@ -1269,9 +1270,56 @@
 
     .app-screenshot {
       width: 100%;
+      min-height: 320px;
       border-radius: 10px;
       border: 1px solid var(--cp-border);
       box-shadow: 0 0 40px var(--cp-accent-soft);
+      background: var(--cp-surface);
+      padding: 20px;
+    }
+
+    .app-preview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--cp-border);
+      color: var(--cp-text-muted);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 12px;
+    }
+
+    .app-preview-status {
+      color: var(--cp-success);
+    }
+
+    .app-preview-task {
+      margin-top: 20px;
+      padding: 16px;
+      border-left: 3px solid var(--cp-accent);
+      background: var(--cp-accent-soft);
+      font-weight: 600;
+    }
+
+    .app-preview-plan {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .app-preview-step {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    .app-preview-step strong {
+      color: var(--cp-accent);
     }
 
     .app-features {
@@ -2447,7 +2495,19 @@
     <p class="reveal d2" style="max-width:620px;">A GitHub-native desktop experience for agentic development — start from the work in front of you, steer it live, and ship through pull requests.</p>
 
     <div class="app-hero-layout">
-      <img src="copilot-app-preview.png" alt="GitHub Copilot App showing a session with code changes and a pull request" class="app-screenshot reveal d3">
+      <div class="app-screenshot app-preview reveal d3" role="img" aria-label="Illustration of a GitHub Copilot App session planning code changes and preparing a pull request">
+        <div class="app-preview-bar">
+          <span>copilot / session</span>
+          <span class="app-preview-status">● Connected</span>
+        </div>
+        <div class="app-preview-task">Implement the issue and prepare a pull request</div>
+        <div class="app-preview-plan">
+          <div class="app-preview-step"><strong>01</strong> Inspect repository context</div>
+          <div class="app-preview-step"><strong>02</strong> Plan and implement changes</div>
+          <div class="app-preview-step"><strong>03</strong> Run checks and review the diff</div>
+          <div class="app-preview-step"><strong>04</strong> Open the pull request</div>
+        </div>
+      </div>
       <div class="app-features">
         <div class="app-feature reveal d3">
           <div class="app-feature-icon">🧭</div>
