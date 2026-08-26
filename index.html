@@ -1162,8 +1162,8 @@
        =========================================== */
     .model-providers {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
       margin-top: 32px;
     }
 
@@ -1171,7 +1171,7 @@
       background: var(--cp-bg-elevated);
       border: 1px solid var(--cp-border);
       border-radius: 10px;
-      padding: 24px;
+      padding: 20px;
     }
 
     .provider-name {
@@ -1249,6 +1249,16 @@
       font-size: 15px;
       font-weight: 600;
       margin-bottom: 4px;
+    }
+
+    .new-item-title a {
+      color: inherit;
+      text-decoration-color: var(--cp-border-strong);
+      text-underline-offset: 3px;
+    }
+
+    .new-item-title a:hover {
+      color: var(--cp-link);
     }
 
     .new-item-desc {
@@ -1916,7 +1926,7 @@
         <strong>Andrea Griffiths</strong>
         <span>Senior Developer Advocate · @acolombiadev</span>
       </div>
-      <div class="updated-badge">Last updated: August 3, 2026</div>
+      <div class="updated-badge">Last updated: August 26, 2026</div>
     </div>
 
     <div class="stat-corner reveal-scale d5">
@@ -2083,9 +2093,9 @@
           <span class="code-existing">}</span>
         </div>
         <p style="margin-top:12px;font-size:13px;"><kbd
-            style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, "Courier New", Courier, monospace;font-size:11px;">Tab</kbd>
+          style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, 'Courier New', Courier, monospace;font-size:11px;">Tab</kbd>
           to accept &nbsp;·&nbsp; <kbd
-            style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, "Courier New", Courier, monospace;font-size:11px;">Esc</kbd>
+            style="background:var(--cp-surface-soft);border:1px solid var(--cp-border);padding:2px 8px;border-radius:3px;font-family:Consolas, 'Courier New', Courier, monospace;font-size:11px;">Esc</kbd>
           to dismiss</p>
       </div>
 
@@ -2181,7 +2191,8 @@
     <div class="agent-note reveal d7">
       <span class="agent-note-icon">!</span>
       <span>Sweet spot: <strong>low-to-medium complexity</strong> tasks in well-tested codebases. Your guardrails stay
-        in place.</span>
+        in place. For complex delegations, choose a supported <strong>reasoning level</strong> deliberately—higher
+        reasoning can improve results but uses more tokens and credits.</span>
     </div>
   </section>
 
@@ -2232,13 +2243,14 @@
         <p>Add Copilot as a reviewer on any PR. First-pass review: bugs, performance, security concerns — all in one
           pass.</p>
         <div class="integration-badges" style="margin-top:14px;">
-          <span class="tag tag-green">CodeQL</span>
-          <span class="tag tag-amber">ESLint</span>
-          <span class="tag tag-green">LLM Reasoning</span>
+          <span class="tag tag-green">Lite</span>
+          <span class="tag tag-amber">Balanced</span>
+          <span class="tag tag-green">Skills + MCP</span>
         </div>
-        <p style="margin-top:14px;font-size:13px;">Suggests fixes with one click. Hand off complex fixes to the coding
-          agent.</p>
-        <p style="margin-top:10px;font-size:13px;">Customize with <span class="mono">copilot-instructions.md</span></p>
+        <p style="margin-top:14px;font-size:13px;">Choose Lite for straightforward changes or Balanced for complex,
+          sensitive PRs. Organization defaults can be overridden per review.</p>
+        <p style="margin-top:10px;font-size:13px;">Customize with <span class="mono">.github/skills</span> and read-only
+          MCP context; review comments identify when either influenced the result.</p>
       </div>
 
       <div class="review-card reveal d4">
@@ -2299,8 +2311,9 @@
     </div>
 
     <div class="enterprise-banner reveal d6">
-      <span style="font-family:Consolas, "Courier New", Courier, monospace;font-size:16px;">★</span>
-      As Hubbers, you're on Enterprise. All of these protections are active for you right now.
+      <span style="font-family:Consolas, 'Courier New', Courier, monospace;font-size:16px;">★</span>
+      In the Copilot app, run <span class="mono">/security-review</span> on local changes before they land. Treat it as
+      an additional check—not a replacement for code scanning, secret scanning, Dependabot, or human review.
     </div>
   </section>
 
@@ -2309,7 +2322,7 @@
     <div class="eyebrow reveal d1">
       <div class="eyebrow-line"></div> Extensibility
     </div>
-    <h2 class="reveal d2">MCP + Extensibility</h2>
+    <h2 class="reveal d2">MCP + Agent Plugins</h2>
 
     <div class="mcp-layout">
       <div class="mcp-explainer">
@@ -2319,12 +2332,13 @@
           Copilot, Claude Code, Cursor, Windsurf, and any MCP-compatible tool.
         </p>
         <p class="reveal d4">
-          An open standard for connecting AI to tools and data sources.
-          Both Agent Mode and the Coding Agent support MCP tools.
+          <strong>Skills</strong> teach reusable instructions and workflows. <strong>MCP</strong> supplies tools and
+          live context. Together they let agents follow your process and act on approved systems.
         </p>
         <p class="reveal d5" style="font-size:14px;">
-          <span class="amber">Note:</span> The old GitHub App-based Extensions were sunset in November 2025
-          and replaced by MCP. Developers shouldn't have to rebuild integrations for every platform.
+          <span class="amber">Agent Plugins 1.0:</span> Package skills and MCP configuration once, then reuse the
+          plugin across VS Code, Copilot CLI, the Copilot app, and the SDK. Enterprise policies can allow or block
+          plugins, marketplaces, and MCP servers.
         </p>
       </div>
 
@@ -2350,7 +2364,7 @@
             <div class="mcp-dot"></div> OAuth authentication supported
           </div>
         </div>
-        <div style="margin-top:16px;" class="tag tag-green">GitHub MCP Registry — discoverable servers</div>
+        <div style="margin-top:16px;" class="tag tag-green">Agent Plugins 1.0 · Generally Available</div>
       </div>
     </div>
   </section>
@@ -2400,6 +2414,14 @@
         <p style="margin-top:12px;font-size:12px;color:var(--cp-text-muted);">Gemini for large context &amp; multi-file ops
         </p>
       </div>
+      <div class="provider-card reveal d5">
+        <div class="provider-name" style="color:var(--cp-accent);">xAI</div>
+        <ul class="model-list">
+          <li>Grok 4.6</li>
+        </ul>
+        <p style="margin-top:12px;font-size:12px;color:var(--cp-text-muted);">Reasoning for long-running agentic
+          workflows. Enterprise policy is off by default.</p>
+      </div>
     </div>
 
     <div class="auto-row reveal d6">
@@ -2410,77 +2432,98 @@
   <!-- ===================== SLIDE 14: WHAT'S NEW ===================== -->
   <section class="slide" id="slide-14" data-index="13">
     <div class="eyebrow reveal d1">
-      <div class="eyebrow-line"></div> Latest Drops · 2026
+      <div class="eyebrow-line"></div> July–August 2026
     </div>
     <h2 class="reveal d2">What's New</h2>
-    <p class="reveal d2" style="max-width:580px;">Copilot ships fast. Here's what landed recently.</p>
+    <p class="reveal d2" style="max-width:680px;">Copilot is becoming a connected, policy-governed agent platform
+      across the app, CLI, IDE, GitHub, and collaboration surfaces.</p>
 
     <div class="whats-new-grid">
       <div class="new-item reveal d3">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">Copilot Memory <span class="tag tag-amber" style="font-size:10px;">Public
-              Preview</span></div>
-          <div class="new-item-desc">Retains repo-specific context across sessions. Shared across Chat, Code Review,
-            CLI, and the Coding Agent. Auto-expires after 28 days.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-25-github-copilot-app-customize-tab-is-generally-available/"
+              target="_blank" rel="noopener">Copilot App Customize Tab</a> <span class="tag tag-green"
+              style="font-size:10px;">GA</span></div>
+          <div class="new-item-desc">Manage instructions, skills, hooks, MCP servers, and plugins from one visual
+            control center in the Copilot app.</div>
         </div>
       </div>
       <div class="new-item reveal d3">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">Copilot SDK <span class="tag tag-amber" style="font-size:10px;">Tech
-              Preview</span></div>
-          <div class="new-item-desc">Programmatic access to the full agent stack in Node.js, Python, Go, and .NET. Embed
-            Copilot into your own developer tools.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-12-agent-plugins-1-0-in-vscode-copilot-cli-and-the-copilot-app/"
+              target="_blank" rel="noopener">Agent Plugins 1.0</a> <span class="tag tag-green"
+              style="font-size:10px;">GA</span></div>
+          <div class="new-item-desc">Portable bundles of skills and MCP configuration now work across VS Code,
+            Copilot CLI, the Copilot app, and the SDK.</div>
         </div>
       </div>
       <div class="new-item reveal d4">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">Plan Mode</div>
-          <div class="new-item-desc">Available in CLI and VS Code. Copilot builds a plan and gets your approval before
-            writing a line.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+              target="_blank" rel="noopener">Code Review: Skills + MCP</a> <span class="tag tag-green"
+              style="font-size:10px;">GA</span></div>
+          <div class="new-item-desc">Reviews can apply team skills and use approved read-only MCP servers for richer,
+            organization-specific context.</div>
         </div>
       </div>
       <div class="new-item reveal d4">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">GPT-5.6 Luna · Sol · Terra</div>
-          <div class="new-item-desc">Latest model drops. New models auto-available for Pro, Pro+, and Free users
-            without visiting settings.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-07-copilot-code-review-effort-levels-are-generally-available/"
+              target="_blank" rel="noopener">Code Review Effort Levels</a> <span class="tag tag-green"
+              style="font-size:10px;">GA</span></div>
+          <div class="new-item-desc">Choose Lite for speed or Balanced for deeper analysis; organizations can set a
+            default while reviewers retain per-review control.</div>
         </div>
       </div>
       <div class="new-item reveal d5">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">Coding Agent Model Picker</div>
-          <div class="new-item-desc">Now available for Business and Enterprise, not just individual plans.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-03-customize-the-reasoning-level-for-copilot-cloud-agent/"
+              target="_blank" rel="noopener">Cloud Agent Reasoning Controls</a></div>
+          <div class="new-item-desc">Select the reasoning level for supported models to balance complex-task quality
+            against token use and premium-request cost.</div>
         </div>
       </div>
       <div class="new-item reveal d5">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">Enterprise Teams Model Policies <span class="tag tag-amber"
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-07-14-security-reviews-now-available-in-the-github-copilot-app/"
+              target="_blank" rel="noopener">Security Review in the App</a> <span class="tag tag-amber"
               style="font-size:10px;">Public Preview</span></div>
-          <div class="new-item-desc">Set a baseline model policy for the enterprise, then grant additional models to
-            specific enterprise teams by role or function.</div>
+          <div class="new-item-desc">Run <span class="mono">/security-review</span> against local changes before
+            committing, with findings and suggested remediations in the session.</div>
         </div>
       </div>
       <div class="new-item reveal d6">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">CLI: Remote Chronicle-In</div>
-          <div class="new-item-desc">Run the CLI against remote repos without cloning. Chronicle-in brings repo context
-            directly into your terminal session.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-21-the-new-github-copilot-experience-in-slack/"
+              target="_blank" rel="noopener">Shared Agent Sessions in Slack</a> <span class="tag tag-amber"
+              style="font-size:10px;">Public Preview</span></div>
+          <div class="new-item-desc">Start and share Copilot agent sessions in channels and threads so teammates can
+            collaborate where work is discussed.</div>
         </div>
       </div>
       <div class="new-item reveal d6">
         <div class="new-dot"></div>
         <div>
-          <div class="new-item-title">GitHub Copilot App <span class="tag tag-amber" style="font-size:10px;">Tech
-              Preview</span></div>
-          <div class="new-item-desc">A GitHub-native desktop app for agentic development. Start sessions from issues or
-            PRs, work with stacked pull requests, steer in real time, and ship via pull request.</div>
+          <div class="new-item-title"><a
+              href="https://github.blog/changelog/2026-08-14-grok-4-6-is-now-available-in-github-copilot/"
+              target="_blank" rel="noopener">Grok 4.6 Model Option</a> <span class="tag tag-amber"
+              style="font-size:10px;">Rolling Out</span></div>
+          <div class="new-item-desc">An xAI reasoning option for long-running agentic workflows. Premium-request usage
+            applies, and Business/Enterprise admins must enable it.</div>
         </div>
       </div>
     </div>
@@ -2489,7 +2532,7 @@
   <!-- ===================== SLIDE 15: COPILOT APP ===================== -->
   <section class="slide" id="slide-15" data-index="14">
     <div class="eyebrow reveal d1">
-      <div class="eyebrow-line"></div> New Surface · May 2026
+      <div class="eyebrow-line"></div> Agent Workspace · Updated August 2026
     </div>
     <h2 class="reveal d2">GitHub Copilot App <span class="tag tag-amber" style="font-size:12px;">Technical Preview</span></h2>
     <p class="reveal d2" style="max-width:620px;">A GitHub-native desktop experience for agentic development — start from the work in front of you, steer it live, and ship through pull requests.</p>
@@ -2538,10 +2581,10 @@
           </div>
         </div>
         <div class="app-feature reveal d6">
-          <div class="app-feature-icon">📚</div>
+          <div class="app-feature-icon">⚙</div>
           <div>
-            <h4>Stacked Pull Requests</h4>
-            <p>Build and manage dependent pull requests as a stack, so related changes can be reviewed and merged in order.</p>
+            <h4>Customize <span class="tag tag-green" style="font-size:9px;">GA</span></h4>
+            <p>Configure instructions, skills, hooks, MCP servers, and agent plugins from a visual control center.</p>
           </div>
         </div>
       </div>
@@ -2650,10 +2693,19 @@
           <div class="surface-features">GitHub-native desktop app<br>Agentic sessions · Agent Merge · Steer &amp; ship from one place</div>
         </div>
       </div>
+      <div class="surface-card reveal d4">
+        <div class="surface-icon">[#]</div>
+        <div>
+          <div class="surface-name">Slack <span class="tag tag-amber" style="font-size:9px;">Public Preview</span></div>
+          <div class="surface-features">Shared agent sessions in channels and threads<br>Collaborate where decisions
+            and work requests already happen</div>
+        </div>
+      </div>
     </div>
 
     <div class="hubber-note reveal d6">
-      ★ &nbsp; As Hubbers, you have a full Enterprise license. Every feature is available to you right now.
+      ★ &nbsp; Enterprise access is governed by organization policy; previews and third-party models may require
+      explicit enablement.
     </div>
   </section>
 
